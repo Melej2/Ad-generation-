@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { VideoAd } from "@/app/page";
 import CopyButton from "./CopyButton";
 
@@ -8,6 +8,8 @@ interface VideoAdCardProps {
   ad: VideoAd;
   index: number;
 }
+
+type VideoStatus = "idle" | "generating" | "done" | "error";
 
 const typeColors: Record<string, { bg: string; text: string; border: string }> = {
   "Problem-Solution": { bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200" },
@@ -24,6 +26,10 @@ function getTypeColor(type: string) {
     }
   }
   return { bg: "bg-indigo-50", text: "text-indigo-700", border: "border-indigo-200" };
+}
+
+function buildVeoPrompt(ad: VideoAd): string {
+  return `${ad.hook} ${ad.visuals} ${ad.cameraMovement} Lighting: ${ad.lighting}. Background: ${ad.background}. Mood: ${ad.mood}. ${ad.cta}`.trim();
 }
 
 function buildFullPrompt(ad: VideoAd): string {
@@ -71,16 +77,110 @@ const fields: Array<{ key: keyof VideoAd; label: string; emoji: string }> = [
 
 export default function VideoAdCard({ ad, index }: VideoAdCardProps) {
   const [expanded, setExpanded] = useState(index === 0);
+  const [videoStatus, setVideoStatus] = useState<VideoStatus>("idle");
+  const [operationName, setOperationName] = useState<string | null>(null);
+  const [videoUri, setVideoUri] = useState<string | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const color = getTypeColor(ad.type);
   const fullPrompt = buildFullPrompt(ad);
+  const veoPrompt = buildVeoPrompt(ad);
+
+  // Revoke old blob URL on unmount
+  useEffect(() => {
+    return () => { if (blobUrl) URL.revokeObjectURL(blobUrl); };
+  }, [blobUrl]);
+
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+  }, []);
+
+  useEffect(() => () => stopPolling(), [stopPolling]);
+
+  const pollOperation = useCallback(async (opName: string) => {
+    try {
+      const res = await fetch("/api/veo/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ operationName: opName }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error ?? "Poll failed");
+
+      if (data.done) {
+        stopPolling();
+        if (data.videoUri) {
+          setVideoUri(data.videoUri);
+          // Fetch the video through the proxy and create a local blob URL
+          try {
+            const dlRes = await fetch("/api/veo/download", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ videoUri: data.videoUri }),
+            });
+            const blob = await dlRes.blob();
+            const url = URL.createObjectURL(blob);
+            setBlobUrl(url);
+          } catch {
+            // Non-fatal: video URI is still available for manual download
+          }
+          setVideoStatus("done");
+        } else {
+          setVideoError("Video generation completed but no video was returned.");
+          setVideoStatus("error");
+        }
+      }
+    } catch (err) {
+      stopPolling();
+      setVideoError(err instanceof Error ? err.message : "Poll failed");
+      setVideoStatus("error");
+    }
+  }, [stopPolling]);
+
+  const handleGenerateVideo = async () => {
+    setVideoStatus("generating");
+    setVideoError(null);
+    setVideoUri(null);
+    setBlobUrl(null);
+    setOperationName(null);
+    setElapsed(0);
+
+    try {
+      const res = await fetch("/api/veo/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: veoPrompt }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error ?? "Failed to start generation");
+
+      const opName = data.operationName;
+      setOperationName(opName);
+
+      // Elapsed timer
+      timerRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
+
+      // Poll every 5 seconds
+      pollRef.current = setInterval(() => pollOperation(opName), 5000);
+    } catch (err) {
+      setVideoError(err instanceof Error ? err.message : "Failed to start video generation");
+      setVideoStatus("error");
+    }
+  };
+
+  const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   return (
-    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm card-hover overflow-hidden`}>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm card-hover overflow-hidden">
       {/* Card Header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full text-left"
-      >
+      <button onClick={() => setExpanded(!expanded)} className="w-full text-left">
         <div className="px-6 py-5 flex items-center gap-4">
           <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-sm flex-shrink-0">
             {index + 1}
@@ -91,6 +191,18 @@ export default function VideoAdCard({ ad, index }: VideoAdCardProps) {
                 {ad.type}
               </span>
               <span className="text-gray-400 text-xs">Video Ad</span>
+              {videoStatus === "done" && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                  Video ready
+                </span>
+              )}
+              {videoStatus === "generating" && (
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  <span className="w-3 h-3 rounded-full border border-indigo-400 border-t-transparent animate-spin"></span>
+                  Generating… {formatTime(elapsed)}
+                </span>
+              )}
             </div>
             {!expanded && (
               <p className="text-gray-600 text-sm mt-1 truncate">{ad.hook}</p>
@@ -110,6 +222,85 @@ export default function VideoAdCard({ ad, index }: VideoAdCardProps) {
       {/* Expanded Content */}
       {expanded && (
         <div className="border-t border-gray-50">
+          {/* Video Player */}
+          {videoStatus === "done" && (
+            <div className="px-6 pt-5">
+              <div className="rounded-xl overflow-hidden bg-black aspect-[9/16] max-w-xs mx-auto">
+                {blobUrl ? (
+                  <video
+                    src={blobUrl}
+                    controls
+                    autoPlay
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white text-sm opacity-60">
+                    Loading video…
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-center gap-3 mt-3 mb-1">
+                {blobUrl && (
+                  <a
+                    href={blobUrl}
+                    download={`ad-${ad.type.toLowerCase().replace(/\s+/g, "-")}.mp4`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-all"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Download MP4
+                  </a>
+                )}
+                <button
+                  onClick={handleGenerateVideo}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-all"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="23 4 23 10 17 10" />
+                    <polyline points="1 20 1 14 7 14" />
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                  </svg>
+                  Regenerate
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Error */}
+          {videoStatus === "error" && videoError && (
+            <div className="mx-6 mt-5 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700 flex items-start gap-2">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span>{videoError}</span>
+            </div>
+          )}
+
+          {/* Generating Progress */}
+          {videoStatus === "generating" && (
+            <div className="mx-6 mt-5 bg-indigo-50 border border-indigo-100 rounded-xl p-5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin flex-shrink-0"></div>
+                <div>
+                  <p className="text-sm font-semibold text-indigo-900">Generating video with Veo 3…</p>
+                  <p className="text-xs text-indigo-600 mt-0.5">This takes about 1–2 minutes · {formatTime(elapsed)} elapsed</p>
+                </div>
+              </div>
+              <div className="mt-3 h-1.5 bg-indigo-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-indigo-500 rounded-full transition-all duration-1000"
+                  style={{ width: `${Math.min((elapsed / 90) * 100, 95)}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+
+          {/* Fields */}
           <div className="px-6 py-5 space-y-5">
             {fields.map(({ key, label, emoji }) => (
               <div key={key} className="group">
@@ -131,10 +322,28 @@ export default function VideoAdCard({ ad, index }: VideoAdCardProps) {
             ))}
           </div>
 
-          {/* Footer with full copy */}
-          <div className="px-6 py-4 bg-indigo-50 border-t border-indigo-100 flex items-center justify-between">
-            <span className="text-xs text-indigo-600 font-medium">Ready for Nano Banana</span>
+          {/* Footer */}
+          <div className="px-6 py-4 bg-indigo-50 border-t border-indigo-100 flex items-center justify-between gap-3">
             <CopyButton text={fullPrompt} label="Copy Full Prompt" />
+            <button
+              onClick={handleGenerateVideo}
+              disabled={videoStatus === "generating"}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-sm"
+            >
+              {videoStatus === "generating" ? (
+                <>
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                  Generating…
+                </>
+              ) : (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  Generate Video
+                </>
+              )}
+            </button>
           </div>
         </div>
       )}
