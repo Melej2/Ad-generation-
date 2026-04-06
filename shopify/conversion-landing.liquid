@@ -1,0 +1,591 @@
+<div class="conversion-landing" id="section-{{ section.id }}">
+
+  {%- comment -%} ─── 1. HERO ─────────────────────────────────────────── {%- endcomment -%}
+  <section class="cl-hero">
+    <div class="cl-hero__media">
+      {%- if section.settings.hero_image != blank -%}
+        {{
+          section.settings.hero_image
+          | image_url: width: 1500
+          | image_tag:
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '375, 750, 1100, 1500',
+            sizes: '100vw',
+            alt: section.settings.hero_image.alt | escape
+        }}
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag: 'cl-hero__placeholder' }}
+      {%- endif -%}
+    </div>
+
+    <div class="cl-hero__content page-width">
+      {%- if section.settings.hero_eyebrow != blank -%}
+        <p class="cl-eyebrow">{{ section.settings.hero_eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.hero_heading != blank -%}
+        <h1 class="cl-hero__heading">{{ section.settings.hero_heading }}</h1>
+      {%- endif -%}
+
+      {%- if section.settings.hero_subheading != blank -%}
+        <p class="cl-hero__sub">{{ section.settings.hero_subheading }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.hero_cta_label != blank -%}
+        <a
+          href="{{ section.settings.hero_cta_url }}"
+          class="button button--primary"
+        >
+          {{ section.settings.hero_cta_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </section>
+
+  {%- comment -%} ─── 2. PROBLEM ──────────────────────────────────────── {%- endcomment -%}
+  {%- if section.settings.problem_heading != blank or section.settings.problem_body != blank -%}
+  <section class="cl-problem page-width">
+    <div class="cl-problem__inner">
+      {%- if section.settings.problem_heading != blank -%}
+        <h2 class="cl-section-heading">{{ section.settings.problem_heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.problem_body != blank -%}
+        <div class="cl-prose">{{ section.settings.problem_body }}</div>
+      {%- endif -%}
+
+      {%- assign pain_blocks = section.blocks | where: 'type', 'pain_point' -%}
+      {%- if pain_blocks.size > 0 -%}
+        <ul class="cl-pain-list">
+          {%- for block in pain_blocks -%}
+            <li class="cl-pain-list__item" {{ block.shopify_attributes }}>
+              {%- if block.settings.pain_icon != blank -%}
+                <span class="cl-pain-list__icon" aria-hidden="true">{{ block.settings.pain_icon }}</span>
+              {%- endif -%}
+              <span>{{ block.settings.pain_text }}</span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </section>
+  {%- endif -%}
+
+  {%- comment -%} ─── 3. SOLUTION ─────────────────────────────────────── {%- endcomment -%}
+  {%- if section.settings.solution_heading != blank -%}
+  <section class="cl-solution page-width">
+    <div class="cl-solution__grid">
+
+      <div class="cl-solution__media">
+        {%- if section.settings.solution_image != blank -%}
+          {{
+            section.settings.solution_image
+            | image_url: width: 900
+            | image_tag:
+              loading: 'lazy',
+              widths: '375, 600, 900',
+              sizes: '(min-width: 990px) 50vw, 100vw',
+              alt: section.settings.solution_image.alt | escape
+          }}
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag: 'cl-solution__placeholder' }}
+        {%- endif -%}
+      </div>
+
+      <div class="cl-solution__copy">
+        {%- if section.settings.solution_eyebrow != blank -%}
+          <p class="cl-eyebrow">{{ section.settings.solution_eyebrow }}</p>
+        {%- endif -%}
+
+        <h2 class="cl-section-heading">{{ section.settings.solution_heading }}</h2>
+
+        {%- if section.settings.solution_body != blank -%}
+          <div class="cl-prose">{{ section.settings.solution_body }}</div>
+        {%- endif -%}
+
+        {%- if section.settings.solution_cta_label != blank -%}
+          <a
+            href="{{ section.settings.solution_cta_url }}"
+            class="button button--secondary"
+          >
+            {{ section.settings.solution_cta_label }}
+          </a>
+        {%- endif -%}
+      </div>
+
+    </div>
+  </section>
+  {%- endif -%}
+
+  {%- comment -%} ─── 4. BENEFITS ─────────────────────────────────────── {%- endcomment -%}
+  {%- assign benefit_blocks = section.blocks | where: 'type', 'benefit' -%}
+  {%- if benefit_blocks.size > 0 -%}
+  <section class="cl-benefits page-width">
+    {%- if section.settings.benefits_heading != blank -%}
+      <h2 class="cl-section-heading cl-section-heading--center">
+        {{ section.settings.benefits_heading }}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.benefits_subheading != blank -%}
+      <p class="cl-section-sub cl-section-sub--center">
+        {{ section.settings.benefits_subheading }}
+      </p>
+    {%- endif -%}
+
+    <ul class="cl-benefits__grid">
+      {%- for block in benefit_blocks -%}
+        <li class="cl-benefit-card" {{ block.shopify_attributes }}>
+          {%- if block.settings.benefit_icon != blank -%}
+            <div class="cl-benefit-card__icon" aria-hidden="true">
+              {{ block.settings.benefit_icon }}
+            </div>
+          {%- endif -%}
+
+          {%- if block.settings.benefit_heading != blank -%}
+            <h3 class="cl-benefit-card__heading">{{ block.settings.benefit_heading }}</h3>
+          {%- endif -%}
+
+          {%- if block.settings.benefit_body != blank -%}
+            <p class="cl-benefit-card__body">{{ block.settings.benefit_body }}</p>
+          {%- endif -%}
+
+          {%- if block.settings.benefit_vs != blank -%}
+            <p class="cl-benefit-card__vs">{{ block.settings.benefit_vs }}</p>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+  {%- endif -%}
+
+  {%- comment -%} ─── 5. SOCIAL PROOF ─────────────────────────────────── {%- endcomment -%}
+  {%- assign testimonial_blocks = section.blocks | where: 'type', 'testimonial' -%}
+  {%- if testimonial_blocks.size > 0 -%}
+  <section class="cl-proof page-width">
+    {%- if section.settings.proof_heading != blank -%}
+      <h2 class="cl-section-heading cl-section-heading--center">
+        {{ section.settings.proof_heading }}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.proof_rating_summary != blank -%}
+      <p class="cl-proof__summary">{{ section.settings.proof_rating_summary }}</p>
+    {%- endif -%}
+
+    <ul class="cl-proof__grid">
+      {%- for block in testimonial_blocks -%}
+        <li class="cl-testimonial" {{ block.shopify_attributes }}>
+
+          <div class="cl-testimonial__stars" aria-label="{{ block.settings.star_count }} out of 5 stars">
+            {%- assign stars = block.settings.star_count | default: 5 -%}
+            {%- for i in (1..stars) -%}
+              <span aria-hidden="true">★</span>
+            {%- endfor -%}
+          </div>
+
+          {%- if block.settings.testimonial_quote != blank -%}
+            <blockquote class="cl-testimonial__quote">
+              {{ block.settings.testimonial_quote }}
+            </blockquote>
+          {%- endif -%}
+
+          {%- if block.settings.testimonial_result != blank -%}
+            <p class="cl-testimonial__result">{{ block.settings.testimonial_result }}</p>
+          {%- endif -%}
+
+          <footer class="cl-testimonial__footer">
+            {%- if block.settings.testimonial_name != blank -%}
+              <cite class="cl-testimonial__name">{{ block.settings.testimonial_name }}</cite>
+            {%- endif -%}
+            {%- if block.settings.testimonial_timeframe != blank -%}
+              <span class="cl-testimonial__timeframe">{{ block.settings.testimonial_timeframe }}</span>
+            {%- endif -%}
+          </footer>
+
+        </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+  {%- endif -%}
+
+  {%- comment -%} ─── 6. CTA ──────────────────────────────────────────── {%- endcomment -%}
+  {%- if section.settings.cta_heading != blank -%}
+  <section class="cl-cta">
+    <div class="cl-cta__inner page-width">
+      <h2 class="cl-cta__heading">{{ section.settings.cta_heading }}</h2>
+
+      {%- if section.settings.cta_body_1 != blank -%}
+        <p class="cl-cta__body">{{ section.settings.cta_body_1 }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.cta_body_2 != blank -%}
+        <p class="cl-cta__body">{{ section.settings.cta_body_2 }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.cta_primary_label != blank -%}
+        <div class="cl-cta__actions">
+          <a
+            href="{{ section.settings.cta_primary_url }}"
+            class="button button--primary"
+          >
+            {{ section.settings.cta_primary_label }}
+          </a>
+
+          {%- if section.settings.cta_guarantee != blank -%}
+            <p class="cl-cta__guarantee">{{ section.settings.cta_guarantee }}</p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </section>
+  {%- endif -%}
+
+</div>
+
+{% schema %}
+{
+  "name": "Conversion Landing",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "hero_eyebrow",
+      "label": "Eyebrow label",
+      "default": "⭐⭐⭐⭐⭐ 4.9 from 2,847 verified customers"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Headline",
+      "default": "Finally — A Solution That Actually Does What It Promises"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subheading",
+      "label": "Subheadline",
+      "default": "Real results for real people. No complicated setup, no empty promises, no wasted money."
+    },
+    {
+      "type": "text",
+      "id": "hero_cta_label",
+      "label": "CTA button label",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "hero_cta_url",
+      "label": "CTA button link"
+    },
+    {
+      "type": "header",
+      "content": "Problem"
+    },
+    {
+      "type": "text",
+      "id": "problem_heading",
+      "label": "Section heading",
+      "default": "Sound familiar?"
+    },
+    {
+      "type": "richtext",
+      "id": "problem_body",
+      "label": "Problem description",
+      "default": "<p>You've tried everything. Each time something promises results, you give it a real shot — and two weeks later you're back to square one, frustrated and out of pocket.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Solution"
+    },
+    {
+      "type": "image_picker",
+      "id": "solution_image",
+      "label": "Product image"
+    },
+    {
+      "type": "text",
+      "id": "solution_eyebrow",
+      "label": "Eyebrow label",
+      "default": "The difference"
+    },
+    {
+      "type": "text",
+      "id": "solution_heading",
+      "label": "Section heading",
+      "default": "Built for real people. Tested in the real world."
+    },
+    {
+      "type": "richtext",
+      "id": "solution_body",
+      "label": "Solution description",
+      "default": "<p>Most products are designed to look good on a shelf. This one was built the other way around — starting with real feedback and real results.</p>"
+    },
+    {
+      "type": "text",
+      "id": "solution_cta_label",
+      "label": "CTA button label",
+      "default": "See how it works"
+    },
+    {
+      "type": "url",
+      "id": "solution_cta_url",
+      "label": "CTA button link"
+    },
+    {
+      "type": "header",
+      "content": "Benefits"
+    },
+    {
+      "type": "text",
+      "id": "benefits_heading",
+      "label": "Section heading",
+      "default": "Why it works when others don't"
+    },
+    {
+      "type": "text",
+      "id": "benefits_subheading",
+      "label": "Section subheading"
+    },
+    {
+      "type": "header",
+      "content": "Social Proof"
+    },
+    {
+      "type": "text",
+      "id": "proof_heading",
+      "label": "Section heading",
+      "default": "What customers are saying"
+    },
+    {
+      "type": "text",
+      "id": "proof_rating_summary",
+      "label": "Rating summary",
+      "default": "⭐⭐⭐⭐⭐ 4.9 average · 2,847 verified reviews"
+    },
+    {
+      "type": "header",
+      "content": "Final CTA"
+    },
+    {
+      "type": "text",
+      "id": "cta_heading",
+      "label": "Closing headline",
+      "default": "The version of this where you've already solved it."
+    },
+    {
+      "type": "textarea",
+      "id": "cta_body_1",
+      "label": "Paragraph 1",
+      "default": "Imagine checking in with yourself six weeks from now. The issue that sent you here today just isn't there anymore. You sorted it — and moved on with your life."
+    },
+    {
+      "type": "textarea",
+      "id": "cta_body_2",
+      "label": "Paragraph 2",
+      "default": "That version of events is available right now. And if it doesn't work, you get your money back in full. There's nothing to lose."
+    },
+    {
+      "type": "text",
+      "id": "cta_primary_label",
+      "label": "CTA button label",
+      "default": "Yes — I'm Ready. Order Now"
+    },
+    {
+      "type": "url",
+      "id": "cta_primary_url",
+      "label": "CTA button link"
+    },
+    {
+      "type": "text",
+      "id": "cta_guarantee",
+      "label": "Guarantee line",
+      "default": "30-day money-back guarantee · Free shipping"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pain_point",
+      "name": "Pain point",
+      "settings": [
+        {
+          "type": "text",
+          "id": "pain_icon",
+          "label": "Icon (emoji or symbol)",
+          "default": "✗"
+        },
+        {
+          "type": "text",
+          "id": "pain_text",
+          "label": "Pain point",
+          "default": "Tired of solutions that promise results but deliver nothing"
+        }
+      ]
+    },
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "settings": [
+        {
+          "type": "text",
+          "id": "benefit_icon",
+          "label": "Icon (emoji or symbol)",
+          "default": "✓"
+        },
+        {
+          "type": "text",
+          "id": "benefit_heading",
+          "label": "Benefit headline",
+          "default": "Results You Can See and Feel"
+        },
+        {
+          "type": "textarea",
+          "id": "benefit_body",
+          "label": "Benefit description",
+          "default": "Designed to deliver outcomes you'll notice — not after months of hoping, but within the first days of use."
+        },
+        {
+          "type": "text",
+          "id": "benefit_vs",
+          "label": "vs. alternatives note (optional)",
+          "default": "Unlike alternatives that require weeks before showing any sign of working."
+        }
+      ]
+    },
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "range",
+          "id": "star_count",
+          "label": "Star rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial_quote",
+          "label": "Review quote",
+          "default": "I'd tried three other products before this one. None of them came close. Within five days I noticed something actually shifting."
+        },
+        {
+          "type": "text",
+          "id": "testimonial_result",
+          "label": "Result highlight",
+          "default": "The problem I'd been dealing with for two years is just... gone."
+        },
+        {
+          "type": "text",
+          "id": "testimonial_name",
+          "label": "Customer name",
+          "default": "Sarah K., verified buyer"
+        },
+        {
+          "type": "text",
+          "id": "testimonial_timeframe",
+          "label": "Timeframe",
+          "default": "Results in 5 days"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Conversion Landing",
+      "blocks": [
+        {
+          "type": "pain_point",
+          "settings": {
+            "pain_icon": "✗",
+            "pain_text": "Tired of solutions that promise results but deliver nothing"
+          }
+        },
+        {
+          "type": "pain_point",
+          "settings": {
+            "pain_icon": "✗",
+            "pain_text": "Wasting money on products that aren't built for real people"
+          }
+        },
+        {
+          "type": "pain_point",
+          "settings": {
+            "pain_icon": "✗",
+            "pain_text": "Exhausted from endless trial and error with no clear path forward"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_icon": "✓",
+            "benefit_heading": "Results You Can See and Feel",
+            "benefit_body": "Designed to deliver outcomes you'll notice — not after months of hoping, but within the first days of use.",
+            "benefit_vs": "Unlike alternatives that require weeks before showing any sign of working."
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_icon": "✓",
+            "benefit_heading": "No Complicated Setup Required",
+            "benefit_body": "Open it, use it, done. Built to fit into your life as it actually is.",
+            "benefit_vs": "Other solutions come with instruction manuals and learning curves. This one doesn't."
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_icon": "✓",
+            "benefit_heading": "Backed by a Risk-Free Guarantee",
+            "benefit_body": "If it doesn't deliver what's promised, you get your money back. No hoops, no email chains.",
+            "benefit_vs": "Competitors bury their returns process. We made ours simple on purpose."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "star_count": 5,
+            "testimonial_quote": "I'd tried three other products before this one. None of them came close. Within five days I noticed something actually shifting.",
+            "testimonial_result": "The problem I'd been dealing with for two years is just... gone.",
+            "testimonial_name": "Sarah K., verified buyer",
+            "testimonial_timeframe": "Results in 5 days"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "star_count": 5,
+            "testimonial_quote": "Honestly I bought it half-expecting to return it. I've been burned before. But I'm still using it three months later.",
+            "testimonial_result": "Best purchase I've made this year.",
+            "testimonial_name": "Marcus T., verified buyer",
+            "testimonial_timeframe": "Still using after 3 months"
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "star_count": 5,
+            "testimonial_quote": "I was sceptical because it seemed too simple. But simple is apparently exactly what I needed.",
+            "testimonial_result": "Wish I'd found this two years ago.",
+            "testimonial_name": "Priya L., verified buyer",
+            "testimonial_timeframe": "Noticeable results in week one"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
