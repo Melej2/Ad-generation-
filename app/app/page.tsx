@@ -7,6 +7,7 @@ import ImageAdCard from "@/components/ImageAdCard";
 import LandingPageForm, { LandingFormData } from "@/components/LandingPageForm";
 import LandingPageResult from "@/components/LandingPageResult";
 import { LandingPage } from "@/app/api/generate-landing/route";
+import { generateShopifySection } from "@/utils/generateShopifySection";
 
 export interface VideoAd {
   id: number;
@@ -139,7 +140,13 @@ function getClientMockLanding(productName: string): LandingPage {
 
 export default function Home() {
   // Shared
-  const [activeTab, setActiveTab] = useState<"ads" | "landing">("ads");
+  const [activeTab, setActiveTab] = useState<"ads" | "landing" | "shopify">("ads");
+
+  // Shopify export state (shares landing page data)
+  const [shopifyCode, setShopifyCode] = useState<string | null>(null);
+  const [shopifyLoading, setShopifyLoading] = useState(false);
+  const [shopifyCopied, setShopifyCopied] = useState(false);
+  const [shopifyShowCode, setShopifyShowCode] = useState(false);
 
   // Ad generator state
   const [adsLoading, setAdsLoading] = useState(false);
@@ -225,6 +232,60 @@ export default function Home() {
     }
   };
 
+  // ── Shopify export ────────────────────────────────────
+  const handleGenerateShopify = async (data: LandingFormData) => {
+    setShopifyLoading(true);
+    setShopifyCode(null);
+    setLandingFormData(data);
+
+    try {
+      let landingData: LandingPage;
+      try {
+        const response = await fetch("/api/generate-landing", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Generation failed");
+        landingData = result.landing;
+      } catch {
+        await new Promise((r) => setTimeout(r, 800));
+        landingData = getClientMockLanding(data.productName);
+      }
+      setLanding(landingData);
+      const code = await generateShopifySection(landingData);
+      setShopifyCode(code);
+      setTimeout(() => {
+        document.getElementById("shopify-result")?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } catch (err) {
+      setLandingError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setShopifyLoading(false);
+    }
+  };
+
+  const handleDownloadLiquid = () => {
+    if (!shopifyCode) return;
+    const slug = (landingFormData?.productName || "product")
+      .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const blob = new Blob([shopifyCode], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${slug}-landing.liquid`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyLiquid = async () => {
+    if (!shopifyCode) return;
+    await navigator.clipboard.writeText(shopifyCode);
+    setShopifyCopied(true);
+    setTimeout(() => setShopifyCopied(false), 2000);
+  };
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -271,6 +332,21 @@ export default function Home() {
                   <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                 </svg>
                 Landing Page
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab("shopify")}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${
+                activeTab === "shopify"
+                  ? "border-black text-gray-900"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                </svg>
+                Shopify Export
               </span>
             </button>
           </div>
@@ -448,6 +524,161 @@ export default function Home() {
                 landing={landing}
                 onRegenerate={() => landingFormData && handleGenerateLanding(landingFormData)}
               />
+            </section>
+          )}
+        </>
+      )}
+
+      {/* ── SHOPIFY EXPORT TAB ── */}
+      {activeTab === "shopify" && (
+        <>
+          <section className="max-w-5xl mx-auto px-6 pt-14 pb-10">
+            <div className="text-center max-w-2xl mx-auto">
+              <div className="inline-flex items-center gap-2 bg-black text-white text-xs font-medium px-3 py-1.5 rounded-full mb-6">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
+                Shopify Dawn Section
+              </div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight tracking-tight">
+                Export to Shopify —<br />One Click, Ready to Install
+              </h1>
+              <p className="text-gray-500 text-lg leading-relaxed">
+                Fill in your product details and get a complete{" "}
+                <code className="text-sm bg-gray-100 px-1.5 py-0.5 rounded">.liquid</code> section
+                with all your copy pre-filled. Drop it into your Dawn theme and it&apos;s live.
+              </p>
+              <div className="mt-8 grid grid-cols-3 gap-4 text-left">
+                {[
+                  { step: "1", label: "Fill in product info", sub: "Name, description, reviews" },
+                  { step: "2", label: "Download the file", sub: "Complete .liquid section" },
+                  { step: "3", label: "Add to Shopify", sub: "Paste into sections/ folder" },
+                ].map(({ step, label, sub }) => (
+                  <div key={step} className="bg-gray-50 border border-gray-100 rounded-xl p-4">
+                    <div className="w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold mb-2">{step}</div>
+                    <p className="text-sm font-semibold text-gray-900">{label}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="max-w-5xl mx-auto px-6 pb-10">
+            <LandingPageForm onGenerate={handleGenerateShopify} loading={shopifyLoading} />
+          </section>
+
+          {landingError && (
+            <div className="max-w-5xl mx-auto px-6 pb-6">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm flex items-center gap-3">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                {landingError}
+              </div>
+            </div>
+          )}
+
+          {shopifyLoading && (
+            <section className="max-w-5xl mx-auto px-6 pb-10">
+              <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="w-10 h-10 rounded-full border-2 border-gray-200 border-t-black animate-spin"></div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Building your Shopify section...</p>
+                    <p className="text-gray-400 text-sm mt-1">Writing copy and packaging the .liquid file</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2 justify-center">
+                    {["Analysing product", "Writing copy", "Building section", "Packaging file"].map((step, i) => (
+                      <span key={i} className="text-xs bg-gray-100 text-gray-500 px-3 py-1 rounded-full">{step}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {shopifyCode && !shopifyLoading && (
+            <section id="shopify-result" className="max-w-5xl mx-auto px-6 pb-20">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+
+                {/* Header */}
+                <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-10 h-10 bg-[#008060] rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-gray-900">Shopify Section Ready</h2>
+                      <p className="text-sm text-gray-400">{(shopifyCode.length / 1024).toFixed(1)} KB · All copy pre-filled · Drop into Dawn theme</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <button
+                      onClick={handleCopyLiquid}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all"
+                    >
+                      {shopifyCopied ? (
+                        <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>Copied!</>
+                      ) : (
+                        <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>Copy Code</>
+                      )}
+                    </button>
+                    <button
+                      onClick={handleDownloadLiquid}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#008060] rounded-xl hover:bg-[#006e52] transition-all"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+                      </svg>
+                      Download .liquid
+                    </button>
+                  </div>
+                </div>
+
+                {/* Install instructions */}
+                <div className="p-6 bg-gray-50 border-b border-gray-100">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">How to install in Shopify</h3>
+                  <ol className="space-y-2 text-sm text-gray-600">
+                    <li className="flex gap-2"><span className="font-bold text-gray-400 flex-shrink-0">1.</span>Download the <code className="bg-white border border-gray-200 px-1.5 py-0.5 rounded text-xs">.liquid</code> file above</li>
+                    <li className="flex gap-2"><span className="font-bold text-gray-400 flex-shrink-0">2.</span>In Shopify Admin → <strong>Online Store → Themes → Edit code</strong></li>
+                    <li className="flex gap-2"><span className="font-bold text-gray-400 flex-shrink-0">3.</span>Open the <code className="bg-white border border-gray-200 px-1.5 py-0.5 rounded text-xs">sections/</code> folder → <strong>Add a new section</strong> → paste the file content</li>
+                    <li className="flex gap-2"><span className="font-bold text-gray-400 flex-shrink-0">4.</span>Go to <strong>Customize → Add section → Conversion Landing</strong> — all your copy is already filled in</li>
+                  </ol>
+                </div>
+
+                {/* Code preview toggle */}
+                <div className="p-4 border-b border-gray-100">
+                  <button
+                    onClick={() => setShopifyShowCode((v) => !v)}
+                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`transition-transform ${shopifyShowCode ? "rotate-90" : ""}`}>
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                    {shopifyShowCode ? "Hide" : "Preview"} code ({shopifyCode.split("\n").length} lines)
+                  </button>
+                </div>
+                {shopifyShowCode && (
+                  <pre className="p-6 text-xs bg-gray-950 text-green-400 overflow-x-auto max-h-96 leading-relaxed">
+                    {shopifyCode}
+                  </pre>
+                )}
+
+                {/* Regenerate */}
+                <div className="p-4 flex justify-end">
+                  <button
+                    onClick={() => landingFormData && handleGenerateShopify(landingFormData)}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
+                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                    </svg>
+                    Regenerate
+                  </button>
+                </div>
+              </div>
             </section>
           )}
         </>
