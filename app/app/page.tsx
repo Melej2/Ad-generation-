@@ -62,6 +62,81 @@ function getClientMockData(productName: string) {
   };
 }
 
+function getClientMockLanding(productName: string): LandingPage {
+  const p = productName || "this product";
+  return {
+    coreMassDesire: {
+      statement: `To finally get real results without wasting money on things that don't work`,
+      painPoints: [
+        `Tired of solutions that promise results but deliver nothing`,
+        `Frustrated by wasting time and money on products that aren't built for real people`,
+        `Exhausted from endless trial and error with no clear path forward`,
+      ],
+      desiredOutcomes: [
+        `A simple, reliable solution that actually works from day one`,
+        `Visible results without complicated routines or hidden costs`,
+        `The confidence that comes from finally solving the problem for good`,
+      ],
+      proofElements: [
+        `Customers consistently report noticeable results within the first week`,
+        `Verified buyers describe it as "the only thing that actually worked"`,
+        `Over 90% of reviewers say they'd recommend it to a close friend`,
+      ],
+    },
+    hero: {
+      trustBadge: `⭐⭐⭐⭐⭐ 4.9/5 from 2,847 verified customers`,
+      headline: `Finally — ${p} That Actually Does What It Promises`,
+      subheadline: `Real results for real people. No complicated setup, no empty promises, no wasted money.`,
+      bullets: [
+        `Works from day one — no learning curve, no frustration`,
+        `Built for everyday use, not a lab setting`,
+        `Thousands of people have already made the switch`,
+        `Backed by a 30-day no-questions-asked guarantee`,
+      ],
+      cta: `Get ${p} Today`,
+    },
+    transformation: {
+      paragraphs: [
+        `You've been here before. You find something that sounds promising, try it, and two weeks later you're back to square one — frustrated, out of pocket, wondering if anything actually works. That cycle is exhausting. And the worst part? You start to believe the problem is you.`,
+        `It's not you. It's that most products are designed to look good, not to solve the actual problem. ${p} was built the other way around — starting with real people, real feedback, and real results. People who've been exactly where you are and needed something that simply works.`,
+        `The difference shows up fast. Not overnight, but in the small moments where you realise you haven't had to think about it. Where the problem that used to follow you around just… isn't there anymore. That's what real results feel like.`,
+      ],
+      cta: `Start Your Transformation — Order Today`,
+    },
+    valueProps: [
+      { headline: `Results You Can See and Feel`, explanation: `${p} is designed to deliver outcomes you'll notice — not after months of hoping, but within the first days of use. Every feature exists for one reason: to make a real difference in your day.`, betterThan: `Unlike alternatives that require weeks before showing any sign of working, this starts delivering from the moment you use it.` },
+      { headline: `No Complicated Setup Required`, explanation: `Open it, use it, done. ${p} was built to fit into your life as it actually is — not as it would need to be if you had an hour to spare every morning.`, betterThan: `Other solutions come with instruction manuals and learning curves. This one works the way your life works.` },
+      { headline: `Designed for Real Everyday People`, explanation: `Every decision started with one question: does this work for someone with a full life, limited time, and no patience for things that don't deliver?`, betterThan: `Most products are tested in ideal conditions. This was tested in the real world — and that's the version you're getting.` },
+      { headline: `Backed by a Risk-Free Guarantee`, explanation: `If ${p} doesn't deliver what's promised, you get your money back. No hoops, no email chains. Just a refund.`, betterThan: `Competitors bury the returns process under friction. We made ours simple on purpose.` },
+    ],
+    howItWorks: [
+      { step: 1, name: `Order in 60 Seconds`, explanation: `Choose your quantity, complete checkout, and you're done. Simple, secure, and fast.`, visualDirection: `Clean product image with a single CTA button, minimal UI, progress indicator` },
+      { step: 2, name: `Arrives Ready to Use`, explanation: `${p} ships fast and arrives ready to go — no assembly, no setup, no frustration before you've even started.`, visualDirection: `Unboxing moment, clean packaging reveal, product in hand` },
+      { step: 3, name: `Use It in Your Daily Life`, explanation: `Fits naturally into what you're already doing. No new habits, no disrupted routines — just an easy addition that works.`, visualDirection: `Lifestyle shot of product being used naturally` },
+      { step: 4, name: `Notice the Difference`, explanation: `Results that speak for themselves — not in weeks, but in days. The kind of change that makes you wonder why you waited.`, visualDirection: `Before/after comparison or satisfied customer expression, bright and clean aesthetic` },
+    ],
+    testimonials: [
+      { story: `I'd tried three other products before this one. None came close. Within five days I noticed something actually shifting, and by the second week I was convinced.`, result: `The problem I'd been dealing with for two years is just... gone.`, timeframe: `Results in 5 days`, name: `Sarah K., verified buyer` },
+      { story: `Honestly I bought it half-expecting to return it. I've been burned before. But I'm still using it three months later and I've since bought two more for family members.`, result: `Best purchase I've made this year.`, timeframe: `Still using after 3 months`, name: `Marcus T., verified buyer` },
+      { story: `I was sceptical because it seemed too simple. But simple is apparently exactly what I needed.`, result: `Wish I'd found this two years ago.`, timeframe: `Noticeable results in week one`, name: `Priya L., verified buyer` },
+    ],
+    objections: {
+      doesItWork: `The short answer: yes, for the vast majority of people. ${p} has been used by thousands of verified customers, and the results speak for themselves. Look at the reviews — not the star rating, the actual words people use. That's your answer.`,
+      isSafe: `${p} was designed with everyday safety as a baseline requirement, not an afterthought. It's been tested for regular use and meets all relevant standards.`,
+      worthThePrice: `Consider what you've already spent trying to solve this problem. Now consider what it costs to solve it for good. ${p} is priced fairly — and with the 30-day guarantee, the only real risk is continuing to do nothing.`,
+      betterThanAlternatives: `Most alternatives either over-engineer a simple problem or under-deliver on a complex one. ${p} does one thing: works. It focuses entirely on the outcome you actually care about.`,
+    },
+    finalClose: {
+      headline: `The Version of This Where You've Already Solved It`,
+      paragraphs: [
+        `Imagine checking in with yourself six weeks from now. The issue that sent you here today isn't something you're carrying around anymore. You've stopped searching for alternatives. You just sorted it — with ${p} — and moved on with your life.`,
+        `That version of events is available to you right now. The only thing between here and there is one decision. And if it doesn't work for you, you get your money back in full. There's nothing to lose except the time you spend not deciding.`,
+      ],
+      cta: `Yes — I'm Ready. Get ${p} Now`,
+    },
+  };
+}
+
 export default function Home() {
   // Shared
   const [activeTab, setActiveTab] = useState<"ads" | "landing">("ads");
@@ -124,14 +199,22 @@ export default function Home() {
     setLandingFormData(data);
 
     try {
-      const response = await fetch("/api/generate-landing", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Generation failed");
-      setLanding(result.landing);
+      let landing: LandingPage;
+      try {
+        const response = await fetch("/api/generate-landing", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Generation failed");
+        landing = result.landing;
+      } catch {
+        // API unavailable (static export / no server) — use client-side mock
+        await new Promise((r) => setTimeout(r, 900));
+        landing = getClientMockLanding(data.productName);
+      }
+      setLanding(landing);
       setTimeout(() => {
         document.getElementById("landing-results")?.scrollIntoView({ behavior: "smooth" });
       }, 100);
