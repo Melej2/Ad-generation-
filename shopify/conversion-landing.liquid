@@ -958,63 +958,145 @@
   "tag": "section",
   "class": "section",
   "settings": [
+
     {
       "type": "header",
-      "content": "Hero"
+      "content": "🎨 Design"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#4F46E5",
+      "info": "Used for buttons, eyebrows, and highlights throughout the section."
+    },
+    {
+      "type": "select",
+      "id": "hero_text_align",
+      "label": "Hero text alignment",
+      "options": [
+        { "value": "left",   "label": "Left"   },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section vertical spacing",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "unit": "rem",
+      "default": 4
+    },
+
+    {
+      "type": "header",
+      "content": "🖼 Hero — Image"
     },
     {
       "type": "image_picker",
       "id": "hero_image",
-      "label": "Hero image"
+      "label": "Background image"
+    },
+    {
+      "type": "select",
+      "id": "hero_image_position",
+      "label": "Image focal point",
+      "options": [
+        { "value": "center center", "label": "Centre"       },
+        { "value": "top center",    "label": "Top"          },
+        { "value": "center left",   "label": "Left"         },
+        { "value": "center right",  "label": "Right"        },
+        { "value": "bottom center", "label": "Bottom"       }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "range",
+      "id": "hero_overlay_opacity",
+      "label": "Dark overlay opacity",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 55,
+      "info": "Increase to make text more readable over bright images."
+    },
+
+    {
+      "type": "header",
+      "content": "📢 Hero — Text"
     },
     {
       "type": "text",
       "id": "hero_eyebrow",
-      "label": "Eyebrow label",
-      "default": "⭐⭐⭐⭐⭐ 4.9 from 2,847 verified customers"
+      "label": "Trust eyebrow",
+      "default": "⭐⭐⭐⭐⭐ 4.9/5 · 2,847 verified buyers · Over 50,000 units sold",
+      "info": "Shown above the headline. Great for a star rating or social proof line."
     },
     {
       "type": "text",
       "id": "hero_heading",
       "label": "Headline",
-      "default": "Finally — A Solution That Actually Does What It Promises"
+      "default": "Stop Wasting Money on Things That Don't Work — This One Does"
     },
     {
       "type": "textarea",
       "id": "hero_subheading",
       "label": "Subheadline",
-      "default": "Real results for real people. No complicated setup, no empty promises, no wasted money."
+      "default": "Join 50,000+ people who solved this problem for good. Results in days, not months. Backed by a 30-day money-back guarantee — so there's zero risk."
+    },
+
+    {
+      "type": "header",
+      "content": "🔘 Hero — Button"
     },
     {
       "type": "text",
       "id": "hero_cta_label",
-      "label": "CTA button label",
-      "default": "Shop Now"
+      "label": "Button text",
+      "default": "Get Yours Before It Sells Out →"
     },
     {
       "type": "url",
       "id": "hero_cta_url",
-      "label": "CTA button link"
+      "label": "Button link"
     },
+
     {
       "type": "header",
-      "content": "Problem"
+      "content": "❌ Problem section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_problem",
+      "label": "Show problem section",
+      "default": true
     },
     {
       "type": "text",
       "id": "problem_heading",
-      "label": "Section heading",
-      "default": "Sound familiar?"
+      "label": "Section headline",
+      "default": "Still Struggling? You're Not Alone."
     },
     {
       "type": "richtext",
       "id": "problem_body",
-      "label": "Problem description",
-      "default": "<p>You've tried everything. Each time something promises results, you give it a real shot — and two weeks later you're back to square one, frustrated and out of pocket.</p>"
+      "label": "Intro paragraph",
+      "default": "<p>You've tried the alternatives. You've spent the money. And you're still here — dealing with the same problem you were dealing with six months ago. It's not you. It's that most products are built to sell, not to work.</p>"
     },
+
     {
       "type": "header",
-      "content": "Solution"
+      "content": "✅ Solution section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_solution",
+      "label": "Show solution section",
+      "default": true
     },
     {
       "type": "image_picker",
@@ -1022,158 +1104,229 @@
       "label": "Product image"
     },
     {
+      "type": "checkbox",
+      "id": "solution_image_right",
+      "label": "Image on the right",
+      "default": false,
+      "info": "When unchecked, image appears on the left."
+    },
+    {
       "type": "text",
       "id": "solution_eyebrow",
       "label": "Eyebrow label",
-      "default": "The difference"
+      "default": "Why this one is different"
     },
     {
       "type": "text",
       "id": "solution_heading",
-      "label": "Section heading",
-      "default": "Built for real people. Tested in the real world."
+      "label": "Headline",
+      "default": "Engineered to Solve the Problem — Not to Look Good on a Shelf"
     },
     {
       "type": "richtext",
       "id": "solution_body",
-      "label": "Solution description",
-      "default": "<p>Most products are designed to look good on a shelf. This one was built the other way around — starting with real feedback and real results.</p>"
+      "label": "Description",
+      "default": "<p>Every feature exists for one reason: to give you results you can actually feel. Not in weeks. Not after a complicated routine. From the very first use — which is why 94% of customers who try it, keep it.</p>"
     },
     {
       "type": "text",
       "id": "solution_cta_label",
-      "label": "CTA button label",
-      "default": "See how it works"
+      "label": "Button text",
+      "default": "See Why It Works — Try Risk-Free"
     },
     {
       "type": "url",
       "id": "solution_cta_url",
-      "label": "CTA button link"
+      "label": "Button link"
     },
+
     {
       "type": "header",
-      "content": "Benefits"
+      "content": "💡 Benefits section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_benefits",
+      "label": "Show benefits section",
+      "default": true
     },
     {
       "type": "text",
       "id": "benefits_heading",
-      "label": "Section heading",
-      "default": "Why it works when others don't"
+      "label": "Section headline",
+      "default": "Everything You Need. Nothing You Don't."
     },
     {
       "type": "text",
       "id": "benefits_subheading",
-      "label": "Section subheading"
+      "label": "Section subheadline",
+      "default": ""
     },
+
     {
       "type": "header",
-      "content": "Social Proof"
+      "content": "⭐ Reviews section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_proof",
+      "label": "Show reviews section",
+      "default": true
     },
     {
       "type": "text",
       "id": "proof_heading",
-      "label": "Section heading",
-      "default": "What customers are saying"
+      "label": "Section headline",
+      "default": "Real People. Real Results. No Cherry-Picking."
+    },
+    {
+      "type": "number",
+      "id": "proof_average_rating",
+      "label": "Average rating (e.g. 4.9)",
+      "default": 49,
+      "info": "Enter as a whole number without decimal — e.g. 49 displays as 4.9"
+    },
+    {
+      "type": "number",
+      "id": "proof_review_count",
+      "label": "Total review count",
+      "default": 2847
     },
     {
       "type": "text",
-      "id": "proof_rating_summary",
-      "label": "Rating summary",
-      "default": "⭐⭐⭐⭐⭐ 4.9 average · 2,847 verified reviews"
+      "id": "proof_platform",
+      "label": "Platform label (optional)",
+      "default": "verified reviews",
+      "info": "e.g. 'verified reviews', 'on Trustpilot', 'on Google'"
     },
+
     {
       "type": "header",
-      "content": "Final CTA"
+      "content": "🏁 Final CTA section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show final CTA section",
+      "default": true
     },
     {
       "type": "text",
       "id": "cta_heading",
       "label": "Closing headline",
-      "default": "The version of this where you've already solved it."
+      "default": "This Is the Last Time You'll Search for a Solution to This Problem."
     },
     {
       "type": "textarea",
       "id": "cta_body_1",
       "label": "Paragraph 1",
-      "default": "Imagine checking in with yourself six weeks from now. The issue that sent you here today just isn't there anymore. You sorted it — and moved on with your life."
+      "default": "Six weeks from now, you could still be where you are — or you could be the person who finally sorted it. The only difference is one decision you make right now. Stock is limited and we can't guarantee availability after today."
     },
     {
       "type": "textarea",
       "id": "cta_body_2",
       "label": "Paragraph 2",
-      "default": "That version of events is available right now. And if it doesn't work, you get your money back in full. There's nothing to lose."
+      "default": "Your order is protected by our 30-day no-questions-asked guarantee. If it doesn't work for you, you pay nothing. The only risk is staying stuck."
     },
     {
       "type": "text",
       "id": "cta_primary_label",
-      "label": "CTA button label",
-      "default": "Yes — I'm Ready. Order Now"
+      "label": "Button text",
+      "default": "Claim Your Discount — Order Today →"
     },
     {
       "type": "url",
       "id": "cta_primary_url",
-      "label": "CTA button link"
+      "label": "Button link"
     },
     {
       "type": "text",
       "id": "cta_guarantee",
-      "label": "Guarantee line",
-      "default": "30-day money-back guarantee · Free shipping"
+      "label": "Guarantee / trust line",
+      "default": "🔒 30-Day Risk-Free Guarantee · 🚚 Free Tracked Shipping · ✓ Secure Checkout · 💳 No Hidden Fees"
+    },
+
+    {
+      "type": "header",
+      "content": "📌 Sticky bar"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sticky_bar",
+      "label": "Show sticky CTA bar on scroll",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sticky_bar_label",
+      "label": "Sticky bar button text",
+      "default": "Order Now — Limited Stock",
+      "info": "Overrides the hero button text in the sticky bar if set."
     }
+
   ],
   "blocks": [
     {
       "type": "pain_point",
       "name": "Pain point",
+      "limit": 6,
       "settings": [
         {
           "type": "text",
           "id": "pain_icon",
-          "label": "Icon (emoji or symbol)",
+          "label": "Icon (emoji)",
           "default": "✗"
         },
         {
           "type": "text",
           "id": "pain_text",
-          "label": "Pain point",
-          "default": "Tired of solutions that promise results but deliver nothing"
+          "label": "Pain point text",
+          "default": "Spent money on products that looked good but changed nothing"
         }
       ]
     },
     {
       "type": "benefit",
-      "name": "Benefit",
+      "name": "Benefit card",
+      "limit": 6,
       "settings": [
         {
           "type": "text",
           "id": "benefit_icon",
-          "label": "Icon (emoji or symbol)",
+          "label": "Icon (emoji)",
           "default": "✓"
         },
         {
           "type": "text",
           "id": "benefit_heading",
-          "label": "Benefit headline",
-          "default": "Results You Can See and Feel"
+          "label": "Card headline",
+          "default": "Visible Results — Often Within Days"
         },
         {
           "type": "textarea",
           "id": "benefit_body",
-          "label": "Benefit description",
-          "default": "Designed to deliver outcomes you'll notice — not after months of hoping, but within the first days of use."
+          "label": "Card description",
+          "default": "94% of customers report a noticeable difference within the first week. Not someday. Not after a 90-day programme. This week."
         },
         {
           "type": "text",
           "id": "benefit_vs",
-          "label": "vs. alternatives note (optional)",
-          "default": "Unlike alternatives that require weeks before showing any sign of working."
+          "label": "vs. alternatives note",
+          "default": "Most alternatives ask for weeks of commitment before showing anything. This one doesn't.",
+          "info": "Optional. Shown in smaller text at the bottom of the card."
         }
       ]
     },
     {
       "type": "testimonial",
-      "name": "Testimonial",
+      "name": "Review",
+      "limit": 6,
       "settings": [
+        {
+          "type": "image_picker",
+          "id": "testimonial_avatar",
+          "label": "Customer photo (optional)"
+        },
         {
           "type": "range",
           "id": "star_count",
@@ -1186,14 +1339,15 @@
         {
           "type": "textarea",
           "id": "testimonial_quote",
-          "label": "Review quote",
-          "default": "I'd tried three other products before this one. None of them came close. Within five days I noticed something actually shifting."
+          "label": "Review text",
+          "default": "I ordered with zero expectations — I've been burned too many times. Day 4 I noticed a difference. By week 2 I ordered a second one for my sister. I don't write reviews but this deserved one."
         },
         {
           "type": "text",
           "id": "testimonial_result",
           "label": "Result highlight",
-          "default": "The problem I'd been dealing with for two years is just... gone."
+          "default": "Down 2 sizes in 6 weeks — without changing my diet.",
+          "info": "Shown as a green highlighted pill. Use a short, specific outcome."
         },
         {
           "type": "text",
@@ -1202,9 +1356,15 @@
           "default": "Sarah K., verified buyer"
         },
         {
+          "type": "checkbox",
+          "id": "testimonial_verified",
+          "label": "Show verified badge",
+          "default": true
+        },
+        {
           "type": "text",
           "id": "testimonial_timeframe",
-          "label": "Timeframe",
+          "label": "Timeframe or location",
           "default": "Results in 5 days"
         }
       ]
@@ -1218,67 +1378,69 @@
           "type": "pain_point",
           "settings": {
             "pain_icon": "✗",
-            "pain_text": "Tired of solutions that promise results but deliver nothing"
+            "pain_text": "Spent £100s on products that promised the world and delivered nothing"
           }
         },
         {
           "type": "pain_point",
           "settings": {
             "pain_icon": "✗",
-            "pain_text": "Wasting money on products that aren't built for real people"
+            "pain_text": "Still dealing with the same problem you were dealing with a year ago"
           }
         },
         {
           "type": "pain_point",
           "settings": {
             "pain_icon": "✗",
-            "pain_text": "Exhausted from endless trial and error with no clear path forward"
+            "pain_text": "Wasted weeks on complicated routines that were impossible to stick to"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_icon": "⚡",
+            "benefit_heading": "Noticeable Results — Often Within Days",
+            "benefit_body": "94% of our customers report a real, tangible difference within the first week. Not someday. Not after 90 days. This week.",
+            "benefit_vs": "Competing products take weeks to show any sign of working — most people give up before that."
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "benefit_icon": "🔒",
+            "benefit_heading": "Zero Risk — 30-Day Full Refund",
+            "benefit_body": "Try it for a full month. If it doesn't deliver exactly what we've promised, email us once and we'll refund every penny. No questions, no hassle.",
+            "benefit_vs": "Our competitors have buried returns processes designed to make you give up. Ours takes one email."
           }
         },
         {
           "type": "benefit",
           "settings": {
             "benefit_icon": "✓",
-            "benefit_heading": "Results You Can See and Feel",
-            "benefit_body": "Designed to deliver outcomes you'll notice — not after months of hoping, but within the first days of use.",
-            "benefit_vs": "Unlike alternatives that require weeks before showing any sign of working."
-          }
-        },
-        {
-          "type": "benefit",
-          "settings": {
-            "benefit_icon": "✓",
-            "benefit_heading": "No Complicated Setup Required",
-            "benefit_body": "Open it, use it, done. Built to fit into your life as it actually is.",
-            "benefit_vs": "Other solutions come with instruction manuals and learning curves. This one doesn't."
-          }
-        },
-        {
-          "type": "benefit",
-          "settings": {
-            "benefit_icon": "✓",
-            "benefit_heading": "Backed by a Risk-Free Guarantee",
-            "benefit_body": "If it doesn't deliver what's promised, you get your money back. No hoops, no email chains.",
-            "benefit_vs": "Competitors bury their returns process. We made ours simple on purpose."
+            "benefit_heading": "Works With Your Life — Not Against It",
+            "benefit_body": "No complicated routine. No 45-minute morning ritual. Open it, use it, and get on with your day. Designed for real people with real schedules.",
+            "benefit_vs": "Most solutions require a complete lifestyle overhaul. This one fits around the life you already have."
           }
         },
         {
           "type": "testimonial",
           "settings": {
             "star_count": 5,
-            "testimonial_quote": "I'd tried three other products before this one. None of them came close. Within five days I noticed something actually shifting.",
-            "testimonial_result": "The problem I'd been dealing with for two years is just... gone.",
+            "testimonial_quote": "I ordered with zero expectations — I've been burned too many times. Day 4 I noticed a difference. By week 2 I ordered a second one for my sister. I never write reviews but this deserved one.",
+            "testimonial_result": "Back pain gone after 4 days. No joke.",
             "testimonial_name": "Sarah K., verified buyer",
-            "testimonial_timeframe": "Results in 5 days"
+            "testimonial_verified": true,
+            "testimonial_timeframe": "Results in 4 days"
           }
         },
         {
           "type": "testimonial",
           "settings": {
             "star_count": 5,
-            "testimonial_quote": "Honestly I bought it half-expecting to return it. I've been burned before. But I'm still using it three months later.",
-            "testimonial_result": "Best purchase I've made this year.",
+            "testimonial_quote": "Bought it half-expecting to return it. I've been burned by products like this before. Three months later I'm still using it every single day and I've recommended it to 6 people.",
+            "testimonial_result": "Lost 14 lbs. Kept it off. 3 months and counting.",
             "testimonial_name": "Marcus T., verified buyer",
+            "testimonial_verified": true,
             "testimonial_timeframe": "Still using after 3 months"
           }
         },
@@ -1286,10 +1448,11 @@
           "type": "testimonial",
           "settings": {
             "star_count": 5,
-            "testimonial_quote": "I was sceptical because it seemed too simple. But simple is apparently exactly what I needed.",
-            "testimonial_result": "Wish I'd found this two years ago.",
+            "testimonial_quote": "Sceptical because it seemed too simple. How could something this straightforward fix what I'd been struggling with for two years? But that's exactly the point. It just works.",
+            "testimonial_result": "Sleeping through the night again for the first time in 2 years.",
             "testimonial_name": "Priya L., verified buyer",
-            "testimonial_timeframe": "Noticeable results in week one"
+            "testimonial_verified": true,
+            "testimonial_timeframe": "Noticeable change by day 6"
           }
         }
       ]
