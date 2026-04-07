@@ -9,6 +9,7 @@ import LandingPageResult from "@/components/LandingPageResult";
 import { LandingPage } from "@/app/api/generate-landing/route";
 import { generateShopifySection } from "@/utils/generateShopifySection";
 import { generateHtmlPreview } from "@/utils/generateHtmlPreview";
+import ChatEditor from "@/components/ChatEditor";
 
 export interface VideoAd {
   id: number;
@@ -141,7 +142,7 @@ function getClientMockLanding(productName: string): LandingPage {
 
 export default function Home() {
   // Shared
-  const [activeTab, setActiveTab] = useState<"ads" | "landing" | "shopify">("ads");
+  const [activeTab, setActiveTab] = useState<"ads" | "landing" | "shopify" | "editor">("ads");
 
   // Shopify export state (shares landing page data)
   const [shopifyCode, setShopifyCode] = useState<string | null>(null);
@@ -348,6 +349,22 @@ export default function Home() {
                   <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                 </svg>
                 Shopify Export
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab("editor")}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${
+                activeTab === "editor"
+                  ? "border-indigo-600 text-indigo-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                AI Editor
+                <span className="text-xs bg-indigo-100 text-indigo-600 px-1.5 py-0.5 rounded-full font-medium">New</span>
               </span>
             </button>
           </div>
@@ -699,6 +716,39 @@ export default function Home() {
             </section>
           )}
         </>
+      )}
+
+      {/* ── AI EDITOR TAB ── */}
+      {activeTab === "editor" && (
+        landing ? (
+          <div className="flex flex-col" style={{ height: "calc(100vh - 97px)" }}>
+            <ChatEditor initialLanding={landing} />
+          </div>
+        ) : (
+          <section className="max-w-5xl mx-auto px-6 pt-14 pb-20">
+            <div className="text-center max-w-2xl mx-auto">
+              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" strokeWidth="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">AI Page Editor</h1>
+              <p className="text-gray-500 text-lg leading-relaxed mb-8">
+                Generate a landing page first, then come back here to refine it with AI chat.
+                Tell the AI what to change — copy, design, layout — and watch it update live.
+              </p>
+              <button
+                onClick={() => setActiveTab("landing")}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+                Generate a Landing Page First
+              </button>
+            </div>
+          </section>
+        )
       )}
 
       <footer className="border-t border-gray-100 bg-white">
