@@ -8,6 +8,7 @@ import LandingPageForm, { LandingFormData } from "@/components/LandingPageForm";
 import LandingPageResult from "@/components/LandingPageResult";
 import { LandingPage } from "@/app/api/generate-landing/route";
 import { generateShopifySection } from "@/utils/generateShopifySection";
+import { generateHtmlPreview } from "@/utils/generateHtmlPreview";
 
 export interface VideoAd {
   id: number;
@@ -613,7 +614,23 @@ export default function Home() {
                       <p className="text-sm text-gray-400">{(shopifyCode.length / 1024).toFixed(1)} KB · All copy pre-filled · Drop into Dawn theme</p>
                     </div>
                   </div>
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex flex-wrap gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => {
+                        if (!landing) return;
+                        const html = generateHtmlPreview(landing);
+                        const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+                        const url = URL.createObjectURL(blob);
+                        window.open(url, "_blank");
+                        setTimeout(() => URL.revokeObjectURL(url), 60000);
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      Preview Page
+                    </button>
                     <button
                       onClick={handleCopyLiquid}
                       className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all"

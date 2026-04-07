@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LandingPage } from "@/app/api/generate-landing/route";
 import CopyButton from "./CopyButton";
+import { generateHtmlPreview } from "@/utils/generateHtmlPreview";
 
 interface LandingPageResultProps {
   landing: LandingPage;
@@ -158,16 +159,53 @@ CTA: ${landing.finalClose.cta}`);
 export default function LandingPageResult({ landing, onRegenerate }: LandingPageResultProps) {
   const fullCopy = buildFullCopy(landing);
 
+  const handlePreview = () => {
+    const html = generateHtmlPreview(landing);
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  };
+
+  const handleDownloadHtml = () => {
+    const html = generateHtmlPreview(landing);
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "landing-page-preview.html";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Landing Page Copy</h2>
           <p className="text-gray-500 text-sm mt-1">7 sections · Ready to use</p>
         </div>
-        <div className="flex items-center gap-3">
-          <CopyButton text={fullCopy} label="Copy All Sections" />
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handlePreview}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+            Preview Page
+          </button>
+          <button
+            onClick={handleDownloadHtml}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download HTML
+          </button>
+          <CopyButton text={fullCopy} label="Copy All" />
           <button
             onClick={onRegenerate}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
