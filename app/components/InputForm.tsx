@@ -13,6 +13,7 @@ export default function InputForm({ onGenerate, loading }: InputFormProps) {
   const [productDescription, setProductDescription] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
   const [productLink, setProductLink] = useState("");
+  const [reviews, setReviews] = useState("");
   const [productImage, setProductImage] = useState<string | null>(null);
   const [imageFileName, setImageFileName] = useState("");
   const [isDragging, setIsDragging] = useState(false);
@@ -21,7 +22,7 @@ export default function InputForm({ onGenerate, loading }: InputFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!productName.trim() || !productDescription.trim() || !targetAudience.trim()) return;
-    onGenerate({ productName, productDescription, targetAudience, productLink, productImage: productImage ?? undefined });
+    onGenerate({ productName, productDescription, targetAudience, productLink, productImage: productImage ?? undefined, reviews: reviews || undefined });
   };
 
   function processFile(file: File) {
@@ -115,6 +116,21 @@ export default function InputForm({ onGenerate, loading }: InputFormProps) {
               rows={4}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
               required
+            />
+          </div>
+
+          {/* Customer Reviews */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-gray-900">
+              Customer Reviews{" "}
+              <span className="text-gray-400 font-normal text-xs">— optional, improves hook quality</span>
+            </label>
+            <textarea
+              value={reviews}
+              onChange={(e) => setReviews(e.target.value)}
+              placeholder="Paste 2-3 real customer reviews here... (e.g. &quot;This changed my life, I use it every morning&quot;)"
+              rows={3}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
             />
           </div>
 
@@ -240,8 +256,8 @@ export default function InputForm({ onGenerate, loading }: InputFormProps) {
       {/* Hint bar */}
       <div className="px-8 py-3 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-4 text-xs text-gray-400">
         <span className="flex items-center gap-1.5">
-          <span className="w-4 h-4 bg-indigo-100 text-indigo-600 rounded flex items-center justify-center text-xs font-bold">5</span>
-          Video prompts
+          <span className="w-4 h-4 bg-indigo-100 text-indigo-600 rounded flex items-center justify-center text-xs font-bold">6</span>
+          Angles × 2 variations
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-4 h-4 bg-violet-100 text-violet-600 rounded flex items-center justify-center text-xs font-bold">5</span>
